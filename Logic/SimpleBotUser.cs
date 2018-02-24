@@ -1,4 +1,5 @@
-﻿using MongoDB.Bson.Serialization.Attributes;
+﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
@@ -13,8 +14,14 @@ namespace SimpleBot
         {
             var cliente = new MongoClient("mongodb://localhost:27017");
             var db = cliente.GetDatabase("bot");
-            var col = db.GetCollection<Message>("message");
-            col.InsertOne(message);
+            var bson = new BsonDocument()
+            {
+                { "id", message.Id },
+                { "user", message.User },
+                { "text", message.Text }
+            };
+            var col = db.GetCollection<BsonDocument>("message");
+            col.InsertOne(bson);
             return $"{message.User} disse '{message.Text}'";
         }
 
