@@ -1,4 +1,6 @@
-﻿using System;
+﻿using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Driver;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -9,6 +11,10 @@ namespace SimpleBot
     {
         public static string Reply(Message message)
         {
+            var cliente = new MongoClient("mongodb://localhost:27017");
+            var db = cliente.GetDatabase("bot");
+            var col = db.GetCollection<Message>("message");
+            col.InsertOne(message);
             return $"{message.User} disse '{message.Text}'";
         }
 
