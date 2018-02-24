@@ -10,28 +10,52 @@ namespace SimpleBot
 {
     public class SimpleBotUser
     {
-        public static string Reply(Message message)
+        static Dictionary<string, UserProfile> _perfil = new Dictionary<string, UserProfile>();
+         public static string Reply(Message message)
+        {
+            string userId = message.Id;
+
+            var perfil = GetProfile(userId);
+
+            perfil.Visitas += 1;
+
+            SetProfile(userId, perfil);
+
+            return $"{message.User} conversou '{perfil.Visitas}'";
+        }
+
+        public static string SalvarHistorico(Message message)
         {
             var cliente = new MongoClient("mongodb://localhost:27017");
             var db = cliente.GetDatabase("bot");
+            var col = db.GetCollection<BsonDocument>("historico");
+
             var bson = new BsonDocument()
             {
-                { "id", message.Id },
-                { "user", message.User },
-                { "text", message.Text }
+                { "User", message.User },
+                { "Text", message.Text }
             };
-            var col = db.GetCollection<BsonDocument>("message");
+
             col.InsertOne(bson);
+
             return $"{message.User} disse '{message.Text}'";
         }
 
         public static UserProfile GetProfile(string id)
         {
-            return null;
+            if (_perfil.ContainsKey(id))
+                return _perfil[id];
+            return new UserProfile()
+            {
+                Id = id,
+                Visitas = 0
+            };
         }
 
         public static void SetProfile(string id, UserProfile profile)
         {
+            _perfil[id] = profile;
+
         }
     }
 }
