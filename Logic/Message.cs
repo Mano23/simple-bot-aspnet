@@ -6,7 +6,7 @@ using System.Web;
 
 namespace SimpleBot
 {
-    [BsonIgnoreExtraElements]
+    
     public class Message
     {
         public string Id { get; }
